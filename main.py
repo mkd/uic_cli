@@ -3,12 +3,15 @@
 # T-121.5300 User Interface Construction
 # Aalto University, School of Science
 import sys
+import sqlite3
+
 ERROR_OPTION_DOES_NOT_EXIST = 991
+DB = "products.db"
 
 
 
 # keep the number of items in the current cart
-no_items = 0
+items = [ ]
 
 
 
@@ -35,7 +38,16 @@ def quit():
 
 ##
 # Sub-program to help the user find a product.
-def search():
+#
+# @param filter_str String containing a filter for the SQL query.
+#
+# @return FIXME
+def search(filter_str):
+    conn   = sqlite3.connect(DB)   
+    cursor = conn.cursor()
+    cursor.execute("select * from product,category where product.name like = '%"
+                 + filter_str + "%' or category.name like = '%"
+                 + filter_str + "%' order by category.name,product.name asc")
     print "\nsearch() called successfully!"
 
 
@@ -62,7 +74,7 @@ def get_menu_option(options):
 ##
 # Display the initial main menu with the major options to the user.
 def main_menu():
-    print "Items in the cart: " + str(no_items) + "\n"
+    print "Items in the cart: " + str(len(items)) + "\n"
 
     option = get_menu_option(['search', 'quit'])
 
