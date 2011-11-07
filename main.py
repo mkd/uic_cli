@@ -12,7 +12,9 @@ DB = "products.db"
 
 # keep the number of items in the current cart
 items = [ ]
-
+shopping_cart = { }
+#goods fetched by search query
+temp_goods_list = []
 
 
 # list of actions
@@ -24,8 +26,6 @@ actions = {
     'empty_cart'   : "Empty cart",
     'find_product' : "Find products",
     'quit'         : "Quit" }
-
-
 
 
 
@@ -43,8 +43,10 @@ def find_product():
     print "\n"
     filter_str = raw_input("Enter a product name or description: ")
     result = search(filter_str)
-    print result
-
+    if result.count > 0:
+        global temp_goods_list
+        temp_goods_list = result
+        print result
 
 
 ##
@@ -95,11 +97,65 @@ def get_menu_option(options):
 ##
 # Display the initial main menu with the major options to the user.
 def main_menu():
-    print "Items in the cart: " + str(len(items)) + "\n"
-    option = get_menu_option(['find_product', 'quit'])
+    #not sure what are items, added shopping cart
+    #print "Items in the cart: " + str(len(items)) + "\n"
+    print "Items in the cart: " + str(len(shopping_cart)) + "\n"
+    # looks messy
+    # if we have any item found we can add it
+    option_list = []
+    if(len(temp_goods_list) > 0):
+        option_list = ['add_item', 'quit']
+    else:
+        option_list = ['find_product', 'quit']
+    if (len(shopping_cart) > 0):
+        print "!!!!!something is in the cart!!!!!!"
+        option_list.extend (['edit_item','checkout','empty_cart'])
+    option = get_menu_option(option_list)
     return option
 
+##
+# ToDo:Check code before adding
+def add_item():
+    print "Enter item's code to add it to the cart"
+    for item in temp_goods_list:
+        print str(item[0]) + ". " + item[1]
+    print "\n"
+    code = -1
+    try:
+        code = int(raw_input("Your choice"));
+        add_to_cart(code)
+    except:
+        code = -1
+##
+# Add item or increase number of item by adding it
+def add_to_cart(code):
+    try:
+        shopping_cart[str(code)] += 1
+    #    count = shopping_cart[str(code)]
+    #if count >= 0:
+    except:
+        shopping_cart[str(code)] = 1
 
+##
+# Just showing shopping list for now
+def checkout():
+    print "Here is you shopping cart"
+    print shopping_cart
+
+    #tem in shopping_cart:
+        #print [x[1] for x in temp_goods_list if x[0]==item]
+        #temp_goods_list[item]
+
+    #We need to store items' names somewhere
+    del temp_goods_list[:]
+
+
+def edit_item():
+    print "editing..."
+
+def empty_cart():
+     shopping_cart.clear()
+     del temp_goods_list[:]
 
 # main program
 opt = ""
