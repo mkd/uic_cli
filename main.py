@@ -17,13 +17,13 @@ items = [ ]
 
 # list of actions
 actions = {
-    'add_item'    : "Add item",
-    'edit_item'   : "Edit item",
-    'remove_item' : "Remove item",
-    'checkout'    : "Check out",
-    'empty_cart'  : "Empty cart",
-    'search'      : "Search product",
-    'quit'        : "Quit" }
+    'add_item'     : "Add item",
+    'edit_item'    : "Edit item",
+    'remove_item'  : "Remove item",
+    'checkout'     : "Check out",
+    'empty_cart'   : "Empty cart",
+    'find_product' : "Find products",
+    'quit'         : "Quit" }
 
 
 
@@ -38,6 +38,15 @@ def quit():
 
 ##
 # Sub-program to help the user find a product.
+def find_product():
+    print "\n"
+    filter_str = raw_input("Enter a product name or description: ")
+    result = search(filter_str)
+    print result
+
+
+##
+# Sub-program to help the user find a product.
 #
 # @param filter_str String containing a filter for the SQL query.
 #
@@ -45,10 +54,10 @@ def quit():
 def search(filter_str):
     conn   = sqlite3.connect(DB)   
     cursor = conn.cursor()
-    cursor.execute("select * from product,category where product.name like = '%"
-                 + filter_str + "%' or category.name like = '%"
+    cursor.execute("select * from product,category where product.name like '%"
+                 + filter_str + "%' or category.name like '%"
                  + filter_str + "%' order by category.name,product.name asc")
-    print "\nsearch() called successfully!"
+    return cursor.fetchall()
 
 
 ##
@@ -76,7 +85,7 @@ def get_menu_option(options):
 def main_menu():
     print "Items in the cart: " + str(len(items)) + "\n"
 
-    option = get_menu_option(['search', 'quit'])
+    option = get_menu_option(['find_product', 'quit'])
 
     if option == ERROR_OPTION_DOES_NOT_EXIST:
         print "\nWrong option.\n"
