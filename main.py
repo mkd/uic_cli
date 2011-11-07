@@ -36,6 +36,7 @@ def quit():
     exit()
 
 
+
 ##
 # Sub-program to help the user find a product.
 def find_product():
@@ -45,19 +46,29 @@ def find_product():
     print result
 
 
+
 ##
 # Sub-program to help the user find a product.
 #
 # @param filter_str String containing a filter for the SQL query.
 #
-# @return FIXME
+# @return a list of tuples with the products that match the filter_str.
 def search(filter_str):
     conn   = sqlite3.connect(DB)   
     cursor = conn.cursor()
-    cursor.execute("select * from product,category where product.name like '%"
-                 + filter_str + "%' or category.name like '%"
-                 + filter_str + "%' order by category.name,product.name asc")
+
+    # first find all products inside a related category
+    cursor.execute("select code from category where name like '%"
+                 + filter_str + "%'")
+    cats = [ ]
+    for c in cursor.fetchall():
+        cats.append(str(c[0]))
+    categories = ', '.join(cats)
+    cursor.execute("select code,name from product where category in ("
+                 + categories + ") or name like '%" 
+                 + filter_str + "%' order by name asc")
     return cursor.fetchall()
+
 
 
 ##
@@ -80,20 +91,13 @@ def get_menu_option(options):
     return options[opt - 1];
 
 
+
 ##
 # Display the initial main menu with the major options to the user.
 def main_menu():
     print "Items in the cart: " + str(len(items)) + "\n"
-
     option = get_menu_option(['find_product', 'quit'])
-
-    if option == ERROR_OPTION_DOES_NOT_EXIST:
-        print "\nWrong option.\n"
-    else:
-        print "\nCallback to execute: " + option
-
     return option
-
 
 
 
@@ -105,6 +109,7 @@ while 1 is 1:
 
     # if the option did not exist in the menu, print the menu again
     if opt == ERROR_OPTION_DOES_NOT_EXIST:
+        print "\nWrong option.\n"
         continue
 
     # load the callback associated with the given option
