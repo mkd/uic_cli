@@ -3,6 +3,7 @@
 # T-121.5300 User Interface Construction
 # Aalto University, School of Science
 import sys
+ERROR_OPTION_DOES_NOT_EXIST = 991
 
 
 
@@ -48,7 +49,14 @@ def get_menu_option(options):
         print str(count) + ". " + actions[o]
         count += 1
 
-    return options[int(raw_input("Your choice: ")) - 1];
+    # sanitize input
+    try:
+        opt = int(raw_input("Your choice: "));
+    except:
+        opt = 0
+    if opt > len(options) or opt < 1:
+        return ERROR_OPTION_DOES_NOT_EXIST
+    return options[opt - 1];
 
 
 ##
@@ -58,7 +66,11 @@ def main_menu():
 
     option = get_menu_option(['search', 'quit'])
 
-    print "\nCallback to execute: " + option
+    if option == ERROR_OPTION_DOES_NOT_EXIST:
+        print "\nWrong option.\n"
+    else:
+        print "\nCallback to execute: " + option
+
     return option
 
 
@@ -67,6 +79,13 @@ def main_menu():
 # main program
 opt = ""
 while 1 is 1:
+    # show the main menu and get an option from the user
     opt = main_menu()
+
+    # if the option did not exist in the menu, print the menu again
+    if opt == ERROR_OPTION_DOES_NOT_EXIST:
+        continue
+
+    # load the callback associated with the given option
     self_module = sys.modules[__name__]
     getattr(self_module, opt)()
